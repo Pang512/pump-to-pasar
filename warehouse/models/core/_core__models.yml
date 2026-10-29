@@ -1,0 +1,65 @@
+# Core layer: country-neutral facts and dimensions.
+# Here the relationship tests are errors, not warnings: the dimensions were built
+# to include every code in the price data, so a miss now means a real bug.
+
+models:
+  - name: fct_prices
+    description: One row per premise, item and day with the observed price.
+    data_tests:
+      - unique:
+          arguments:
+            column_name: "(country_code || '|' || price_date || '|' || premise_id || '|' || item_id)"
+    columns:
+      - name: price_date
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: premise_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_premise')
+                field: premise_id
+      - name: item_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_item')
+                field: item_id
+      - name: price
+        data_tests:
+          - not_null
+
+  - name: dim_item
+    description: One row per item; items missing from the lookup are kept as UNNAMED.
+    columns:
+      - name: item_id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: dim_premise
+    description: One row per premise with state, district, premise type and region.
+    columns:
+      - name: premise_id
+        data_tests:
+          - unique
+          - not_null
+      - name: region
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["Peninsular", "East", "Unknown"]
+
+  - name: dim_date
+    description: One row per calendar day in the study window.
+    columns:
+      - name: date_day
+        data_tests:
+          - unique
+          - not_null

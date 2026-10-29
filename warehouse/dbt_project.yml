@@ -22,3 +22,6 @@ models:
       # Views store only the query, not a copy of the data.
       # Staging is a thin cleaning layer, so views keep the database small.
       +materialized: view
+    core:
+      # Core models are read often by the analysis, so store them as tables.
+      +materialized: table

@@ -1,5 +1,5 @@
 # Python environment and caches
-hwvenv/
+ptpvenv/
 __pycache__/
 *.pyc
 

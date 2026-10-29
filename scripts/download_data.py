@@ -1,17 +1,20 @@
 """
-Step 1a: download the PriceCatcher sample for the feasibility check.
+Download PriceCatcher monthly files plus the item and premise lookups.
+
+Usage (run from the project root):
+  python scripts/download_data.py 2024-01 2024-12   # a range of months, inclusive
+  python scripts/download_data.py 2025-07           # a single month
 
 What it downloads (into data/raw/):
   - lookup_item.parquet     item code -> name, unit, group, category
   - lookup_premise.parquet  premise code -> name, type, state, district
-  - pricecatcher_YYYY-MM.parquet for April to September 2025
-    (3 months before and 3 months after the 1 July 2025 SST change)
+  - pricecatcher_YYYY-MM.parquet for each month requested
 
 Source: OpenDOSM / data.gov.my, PriceCatcher (KPDN and DOSM), CC BY 4.0.
-Run from the project root:  python scripts/download_data.py
 Re-running is safe: files that already exist are skipped.
 """
 
+import sys
 from pathlib import Path
 
 import requests
@@ -19,12 +22,16 @@ import requests
 BASE_URL = "https://storage.data.gov.my/pricecatcher"
 RAW_DIR = Path("data/raw")
 
-# Months to download for the feasibility sample.
-MONTHS = ["2025-04", "2025-05", "2025-06", "2025-07", "2025-08", "2025-09"]
 
-FILES = ["lookup_item.parquet", "lookup_premise.parquet"] + [
-    f"pricecatcher_{m}.parquet" for m in MONTHS
-]
+def month_range(start: str, end: str) -> list[str]:
+    """'2024-01', '2024-03' -> ['2024-01', '2024-02', '2024-03']"""
+    y, m = map(int, start.split("-"))
+    end_y, end_m = map(int, end.split("-"))
+    months = []
+    while (y, m) <= (end_y, end_m):
+        months.append(f"{y:04d}-{m:02d}")
+        y, m = (y + 1, 1) if m == 12 else (y, m + 1)
+    return months
 
 
 def is_parquet(path: Path) -> bool:
@@ -61,9 +68,17 @@ def download(name: str) -> None:
 
 
 def main() -> None:
+    args = sys.argv[1:]
+    if len(args) not in (1, 2):
+        sys.exit("Usage: python scripts/download_data.py START_MONTH [END_MONTH]   e.g. 2024-01 2024-12")
+    months = month_range(args[0], args[-1])
+
+    files = ["lookup_item.parquet", "lookup_premise.parquet"] + [
+        f"pricecatcher_{m}.parquet" for m in months
+    ]
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    print(f"Downloading {len(FILES)} files into {RAW_DIR.resolve()}")
-    for name in FILES:
+    print(f"Downloading {len(files)} files into {RAW_DIR.resolve()}")
+    for name in files:
         download(name)
     print("Done.")
 

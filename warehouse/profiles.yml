@@ -1,0 +1,10 @@
+# Connection settings. dbt reads this file from the folder you run it in.
+# DuckDB is a single local file, so there are no passwords or servers.
+
+pump_to_pasar:
+  target: dev
+  outputs:
+    dev:
+      type: duckdb
+      path: pump_to_pasar.duckdb   # created inside the warehouse folder; ignored by Git
+      threads: 4

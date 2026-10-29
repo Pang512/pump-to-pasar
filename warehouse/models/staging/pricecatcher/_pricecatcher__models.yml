@@ -1,0 +1,57 @@
+# Documentation and tests for the staging models.
+# "error" tests stop the build; "warn" tests report a known issue without stopping it.
+
+models:
+  - name: stg_pricecatcher__prices
+    description: One row per price observation within the study window.
+    columns:
+      - name: price_date
+        data_tests:
+          - not_null
+      - name: premise_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_pricecatcher__premises')
+                field: premise_id
+              config:
+                severity: warn
+      - name: item_id
+        data_tests:
+          - not_null
+          - relationships:
+              # Known issue: some item codes have no row in the item lookup.
+              # Kept as a warning; handled in the core layer (step 2b).
+              arguments:
+                to: ref('stg_pricecatcher__items')
+                field: item_id
+              config:
+                severity: warn
+      - name: price
+        description: Price in local currency (Malaysian ringgit for PriceCatcher).
+        data_tests:
+          - not_null
+
+  - name: stg_pricecatcher__items
+    description: One row per item in the PriceCatcher item lookup.
+    columns:
+      - name: item_id
+        data_tests:
+          - unique
+          - not_null
+
+  - name: stg_pricecatcher__premises
+    description: One row per premise, with a region label (Peninsular or East).
+    columns:
+      - name: premise_id
+        data_tests:
+          - unique
+          - not_null
+      - name: region
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["Peninsular", "East"]
+              config:
+                severity: warn

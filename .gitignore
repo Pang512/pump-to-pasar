@@ -15,3 +15,9 @@ data/
 .vscode/
 .DS_Store
 Thumbs.db
+
+# dbt build artefacts (regenerated on every run)
+target/
+logs/
+dbt_packages/
+.user.yml

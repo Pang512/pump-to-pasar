@@ -1,0 +1,28 @@
+# Sources = the raw data dbt reads but does not create.
+# Here they are the PriceCatcher Parquet files downloaded by scripts/download_data.py.
+# Paths are relative to the warehouse folder, where dbt runs.
+
+sources:
+  - name: pricecatcher
+    description: >
+      PriceCatcher daily item prices by premise, from KPDN and DOSM (OpenDOSM / data.gov.my),
+      licensed CC BY 4.0. One monthly Parquet file per month, plus item and premise lookups.
+    tables:
+      - name: prices
+        description: One row per price observation (date, premise, item, price).
+        config:
+          meta:
+            # union_by_name lets months with slightly different column types be read together
+            external_location: "read_parquet('../data/raw/pricecatcher_*.parquet', union_by_name = true)"
+
+      - name: items
+        description: Item lookup (code, name, unit, group, category).
+        config:
+          meta:
+            external_location: "read_parquet('../data/raw/lookup_item.parquet')"
+
+      - name: premises
+        description: Premise lookup (code, name, address, type, state, district).
+        config:
+          meta:
+            external_location: "read_parquet('../data/raw/lookup_premise.parquet')"

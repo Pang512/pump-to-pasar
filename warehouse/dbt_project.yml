@@ -1,0 +1,24 @@
+# dbt project for Pump to Pasar.
+# Run every dbt command from inside this "warehouse" folder.
+
+name: pump_to_pasar
+version: "1.0.0"
+profile: pump_to_pasar   # must match the top key in profiles.yml
+
+model-paths: ["models"]
+test-paths: ["tests"]
+
+clean-targets: ["target", "dbt_packages"]
+
+vars:
+  # Study window: 17 months before the 10 June 2024 diesel change, 12 months after.
+  # Ends before July 2025 (SST change and PriceCatcher collection change).
+  study_start_date: "2023-01-01"
+  study_end_date: "2025-06-30"
+
+models:
+  pump_to_pasar:
+    staging:
+      # Views store only the query, not a copy of the data.
+      # Staging is a thin cleaning layer, so views keep the database small.
+      +materialized: view

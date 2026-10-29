@@ -1,0 +1,17 @@
+# Python environment and caches
+hwvenv/
+__pycache__/
+*.pyc
+
+# Data is downloaded by scripts/download_data.py, never committed
+data/
+*.parquet
+*.part
+
+# Local database files
+*.duckdb
+
+# Editor and OS clutter
+.vscode/
+.DS_Store
+Thumbs.db

@@ -1,0 +1,35 @@
+models:
+  - name: mart_diesel__pair_week
+    description: >
+      Premise x item x week panel of log prices for the diesel analysis, limited to
+      pairs observed both before and after 10 June 2024, demeaned by each pair's
+      pre-policy average.
+    data_tests:
+      - unique:
+          arguments:
+            column_name: "(premise_id || '|' || item_id || '|' || week_start)"
+    columns:
+      - name: region
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: ["Peninsular", "East"]
+      - name: log_price_vs_pre
+        data_tests:
+          - not_null
+
+  - name: mart_diesel__item_region_week
+    description: >
+      Item x region x week panel: average change in log price relative to each
+      pair's pre-policy level. Input to the event study and DiD regressions.
+    data_tests:
+      - unique:
+          arguments:
+            column_name: "(item_id || '|' || region || '|' || week_start)"
+    columns:
+      - name: y
+        data_tests:
+          - not_null
+      - name: n_pairs
+        data_tests:
+          - not_null

@@ -4,3 +4,5 @@ pyarrow==26.0.0
 requests==2.34.2
 dbt-core==1.12.6
 dbt-duckdb==1.11.1
+pyfixest==0.60.0
+matplotlib==3.11.2

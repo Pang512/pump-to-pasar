@@ -15,6 +15,11 @@ vars:
   # Ends before July 2025 (SST change and PriceCatcher collection change).
   study_start_date: "2023-01-01"
   study_end_date: "2025-06-30"
+  # Diesel rose to RM3.35/litre in Peninsular Malaysia from this date (a Monday).
+  diesel_policy_date: "2024-06-10"
+  # Analysis uses whole Monday-to-Sunday weeks inside the study window.
+  first_full_week: "2023-01-02"
+  last_full_week: "2025-06-23"
 
 models:
   pump_to_pasar:
@@ -24,4 +29,6 @@ models:
       +materialized: view
     core:
       # Core models are read often by the analysis, so store them as tables.
+      +materialized: table
+    marts:
       +materialized: table

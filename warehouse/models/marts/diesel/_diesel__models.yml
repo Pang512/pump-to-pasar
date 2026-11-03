@@ -18,6 +18,13 @@ models:
         data_tests:
           - not_null
 
+  - name: mart_diesel__item_region_type_week
+    description: Item x region x premise type x week panel, for the shop-type breakdown.
+    data_tests:
+      - unique:
+          arguments:
+            column_name: "(item_id || '|' || region || '|' || premise_type || '|' || week_start)"
+
   - name: mart_diesel__item_region_week
     description: >
       Item x region x week panel: average change in log price relative to each
